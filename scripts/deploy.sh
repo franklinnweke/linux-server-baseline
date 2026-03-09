@@ -22,7 +22,11 @@ require_env LETSENCRYPT_EMAIL
 run_cmd install -d -m 755 "$PROJECT_DIR"
 run_cmd cp -f "$ROOT_DIR/compose/docker-compose.yml" "$PROJECT_DIR/docker-compose.yml"
 if [ ! -f "$PROJECT_DIR/.env" ]; then
-  run_cmd cp "$ROOT_DIR/compose/.env.example" "$PROJECT_DIR/.env"
+  if [ -f "$ROOT_DIR/compose/.env" ]; then
+    run_cmd cp "$ROOT_DIR/compose/.env" "$PROJECT_DIR/.env"
+  else
+    run_cmd cp "$ROOT_DIR/compose/.env.example" "$PROJECT_DIR/.env"
+  fi
 fi
 
 if [ "$DRY_RUN" = false ]; then

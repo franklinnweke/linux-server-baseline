@@ -21,7 +21,18 @@ if [ "$DRY_RUN" = true ]; then
   exit 0
 fi
 
-tar -czf "$ARCHIVE" -C "$PROJECT_DIR" .env docker-compose.yml .deploy-state 2>/dev/null || true
+backup_items=()
+for item in .env docker-compose.yml .deploy-state; do
+  if [ -f "$PROJECT_DIR/$item" ]; then
+    backup_items+=("$item")
+  else
+    log_warn "Missing backup item: $PROJECT_DIR/$item"
+  fi
+done
+
+[ "${#backup_items[@]}" -gt 0 ] || die 'No backup source files found; refusing to create empty backup.'
+tar -czf "$ARCHIVE" -C "$PROJECT_DIR" "${backup_items[@]}"
+[ -s "$ARCHIVE" ] || die "Backup archive was not created correctly: $ARCHIVE"
 
 if docker volume ls --format '{{.Name}}' | grep -qx 'n8n_data'; then
   docker run --rm -v n8n_data:/data -v "$BACKUP_DIR":/backup busybox sh -c "tar -czf /backup/n8n_data-$TIMESTAMP.tar.gz -C /data ."

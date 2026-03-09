@@ -24,6 +24,10 @@ if [ "$DRY_RUN" = true ]; then
   exit 0
 fi
 
+log_warn 'Resetting UFW to baseline (existing rules will be cleared)'
+if [ "$ASSUME_YES" != true ]; then
+  confirm_action 'Proceed with UFW reset and baseline rule application?' || die 'Aborted firewall reset.'
+fi
 ufw --force reset
 ufw default deny incoming
 ufw default allow outgoing
