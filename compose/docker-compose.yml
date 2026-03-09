@@ -1,0 +1,22 @@
+services:
+  n8n:
+    image: "${APP_IMAGE}:${APP_TAG}"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT_INTERNAL}:${APP_PORT_INTERNAL}"
+    environment:
+      - TZ=${TZ}
+      - N8N_PORT=${APP_PORT_INTERNAL}
+      - N8N_HOST=${DOMAIN}
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://${DOMAIN}/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:' + process.env.N8N_PORT + '/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  n8n_data:

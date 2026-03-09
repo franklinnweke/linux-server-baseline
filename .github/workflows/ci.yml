@@ -1,0 +1,20 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tooling
+        run: sudo apt-get update && sudo apt-get install -y shellcheck yamllint
+      - name: Shellcheck
+        run: shellcheck setup.sh lib/*.sh scripts/*.sh
+      - name: Bash syntax
+        run: bash -n setup.sh lib/*.sh scripts/*.sh
+      - name: YAML lint
+        run: yamllint compose/docker-compose.yml .github/workflows/ci.yml

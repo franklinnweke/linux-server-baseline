@@ -1,0 +1,6 @@
+[Unit]
+Description=Linux Server Baseline Backup
+
+[Service]
+Type=oneshot
+ExecStart=/opt/linux-server-baseline/scripts/backup.sh
