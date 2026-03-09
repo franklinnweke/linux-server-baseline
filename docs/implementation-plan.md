@@ -9,7 +9,7 @@ Initial build roughly followed:
 
 Tested on DigitalOcean $6/month droplet (Ubuntu 24.04).
 
-## TODO
+## Future Improvements
 - Add volume backup auto-detection instead of hardcoding n8n_data
 - Consider multi-app template support
 - Prometheus exporter integration?
