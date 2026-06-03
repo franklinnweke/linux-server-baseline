@@ -13,7 +13,10 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:' + process.env.N8N_PORT + '/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      test: >
+        node -e "fetch('http://127.0.0.1:' + process.env.N8N_PORT + '/healthz')
+        .then(r => process.exit(r.ok ? 0 : 1))
+        .catch(() => process.exit(1))"
       interval: 30s
       timeout: 10s
       retries: 5

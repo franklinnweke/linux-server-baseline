@@ -17,13 +17,16 @@ previous_tag="$(jq -r '.previous_tag // empty' "$STATE_FILE")"
 current_tag="$(jq -r '.current_tag // empty' "$STATE_FILE")"
 app_image="$(jq -r '.app_image // empty' "$STATE_FILE")"
 domain="$(jq -r '.domain // empty' "$STATE_FILE")"
+letsencrypt_email="$(jq -r '.letsencrypt_email // empty' "$STATE_FILE")"
 
 [ -n "$previous_tag" ] || die 'No previous_tag available. Cannot rollback first deploy.'
 
 export APP_TAG="$previous_tag"
 export APP_IMAGE="$app_image"
 export DOMAIN="$domain"
-export LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-ops@example.com}"
+if [ -z "${LETSENCRYPT_EMAIL:-}" ] && [ -n "$letsencrypt_email" ]; then
+  export LETSENCRYPT_EMAIL="$letsencrypt_email"
+fi
 
 deploy_flags=()
 if [ "$DRY_RUN" = true ]; then

@@ -3,7 +3,7 @@ name: ci
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint:
@@ -11,10 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install tooling
-        run: sudo apt-get update && sudo apt-get install -y shellcheck yamllint
+        run: sudo apt-get update && sudo apt-get install -y shellcheck yamllint nginx gettext-base
       - name: Shellcheck
         run: shellcheck setup.sh lib/*.sh scripts/*.sh
       - name: Bash syntax
         run: bash -n setup.sh lib/*.sh scripts/*.sh
       - name: YAML lint
-        run: yamllint compose/docker-compose.yml .github/workflows/ci.yml
+        run: yamllint compose/docker-compose.yml .github/workflows/ci.yml .yamllint.yml
+      - name: Nginx template
+        run: |
+          DOMAIN=example.com APP_PORT_INTERNAL=5678 \
+            envsubst '${DOMAIN} ${APP_PORT_INTERNAL}' \
+              < nginx/site.conf.template \
+              > /tmp/linux-server-baseline.conf
+          site_available=/etc/nginx/sites-available/linux-server-baseline.conf
+          site_enabled=/etc/nginx/sites-enabled/linux-server-baseline.conf
+          sudo cp /tmp/linux-server-baseline.conf "$site_available"
+          sudo ln -sfn "$site_available" "$site_enabled"
+          sudo rm -f /etc/nginx/sites-enabled/default
+          sudo nginx -t

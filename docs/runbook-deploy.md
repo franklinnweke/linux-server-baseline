@@ -1,7 +1,7 @@
 # Runbook: Deploy
 
 1. Ensure DNS A record points to droplet public IP.
-2. `cp compose/.env.example compose/.env` and update values.
+2. `cp compose/.env.example compose/.env` and update values. Do not commit `compose/.env`.
 3. Run `sudo ./setup.sh --domain <domain> --email <email>`.
 4. Run `sudo ./scripts/verify.sh`.
 
@@ -9,8 +9,11 @@
 
 ## Updating
 
-Change `APP_TAG` in `/opt/linux-server-baseline/.env`, then re-run deploy from repo:
+Change `APP_TAG` in `/opt/linux-server-baseline/.env`, then re-run deploy from the cloned repo:
+
 ```bash
-cd ~/linux-server-baseline  # Or wherever you cloned the repo
+cd ~/linux-server-baseline
 sudo ./scripts/deploy.sh
 ```
+
+`deploy.sh` reads `/opt/linux-server-baseline/.env` and records the previous tag in `/opt/linux-server-baseline/.deploy-state` for rollback.

@@ -19,6 +19,7 @@ if ufw status | grep -q 'Status: active'; then pass 'UFW active'; else err 'UFW 
 if systemctl is-active --quiet docker; then pass 'Docker running'; else err 'Docker not running'; fi
 if [ -f "$PROJECT_DIR/docker-compose.yml" ] && docker compose -f "$PROJECT_DIR/docker-compose.yml" --env-file "$PROJECT_DIR/.env" ps >/dev/null 2>&1; then pass 'Compose stack healthy'; else err 'Compose stack check failed'; fi
 if nginx -t >/dev/null 2>&1; then pass 'Nginx config valid'; else err 'Nginx config invalid'; fi
+if systemctl is-enabled --quiet linux-server-baseline-backup.timer 2>/dev/null; then pass 'Backup timer enabled'; else err 'Backup timer not enabled'; fi
 
 if [ -f "$STATE_FILE" ]; then
   if command_exists jq && jq -e '.current_tag and .app_image and .domain' "$STATE_FILE" >/dev/null; then

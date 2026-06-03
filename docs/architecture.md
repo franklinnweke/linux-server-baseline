@@ -1,25 +1,25 @@
 # Architecture
 
-The baseline follows a standard VPS deployment pattern: public-facing nginx handling TLS, proxying to a local-only container.
+The baseline follows a standard single-VPS deployment pattern: public-facing Nginx terminates TLS and proxies traffic to a container bound on localhost.
 
 ```mermaid
 flowchart TD
-  U[User Browser] --> D[DNS A Record]
-  D --> N[Nginx TLS Reverse Proxy]
-  N --> A[App Container]
-  A --> V[Persistent Volume]
+  U["User browser"] --> D["DNS A record"]
+  D --> N["Nginx TLS reverse proxy"]
+  N --> A["App container on 127.0.0.1"]
+  A --> V["Docker volume"]
 ```
 
 ## Components
 
-- **Nginx**: TLS termination (Let's Encrypt), HTTP→HTTPS redirect, reverse proxy to app
+- **Nginx**: TLS termination with Let's Encrypt, HTTP-to-HTTPS redirect, reverse proxy to app
 - **Docker Compose**: Single-container app stack, binds to 127.0.0.1 only
 - **UFW**: Firewall allowing 22/80/443, deny everything else
 - **SSH**: Key-only auth, root login configurable
-- **Backups**: Daily systemd timer at 02:30, 7-day retention
+- **Backups**: Daily systemd timer at 02:30, 7-day retention by default
 
 ## Security Model
 
-App container never exposed directly - nginx proxies on 127.0.0.1:5678. UFW blocks all inbound except SSH/HTTP/HTTPS. SSH requires keys, no passwords.
+The app container is not exposed directly. Nginx proxies to `127.0.0.1:5678`, UFW blocks inbound traffic except SSH/HTTP/HTTPS, and SSH password authentication is disabled.
 
 State tracked in `/opt/linux-server-baseline/.deploy-state` as JSON for rollback support.

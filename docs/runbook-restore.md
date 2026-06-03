@@ -9,3 +9,4 @@
      sh -c "cd /data && tar -xzf /backup/n8n_data-TIMESTAMP.tar.gz"
    ```
 5. Redeploy: `sudo ./scripts/deploy.sh`.
+6. Verify: `sudo ./scripts/verify.sh`.

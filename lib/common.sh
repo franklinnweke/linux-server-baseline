@@ -27,6 +27,15 @@ require_env() {
   [ -n "${!var_name:-}" ] || die "Missing required env var: $var_name"
 }
 
+load_env_file() {
+  local env_file="$1"
+  [ -f "$env_file" ] || return 0
+  set -a
+  # shellcheck disable=SC1090
+  . "$env_file"
+  set +a
+}
+
 parse_common_flags() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
